@@ -13,50 +13,35 @@ import {
   FormLabel,
   FormMessage
 } from "@/components/ui/form";
-import { registerSchema } from "@/schemas";
+import { loginSchema } from "@/schemas";
 import { cn } from "@/utils/cn";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
 
 import { Input } from "../ui/input";
-import { FormError } from "./FormError";
 
-export function SignupForm() {
-  const form = useForm<z.infer<typeof registerSchema>>({
-    resolver: zodResolver(registerSchema),
+export function SigninForm() {
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
       email: "",
       password: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof registerSchema>) {
+  function onSubmit(values: z.infer<typeof loginSchema>) {
     console.log(values);
   }
 
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
-      <h1 className="text-3xl font-bold">Sign Up</h1>
+      <h1 className="text-3xl font-bold">Sign In</h1>
+
       <Form {...form}>
         <form
           className="flex flex-col gap-y-4 my-4"
           onSubmit={form.handleSubmit(onSubmit)}
         >
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input placeholder="Username" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           <FormField
             control={form.control}
             name="email"
@@ -85,13 +70,11 @@ export function SignupForm() {
             )}
           />
 
-          <FormError message="Invalid Credentials" />
-
           <button
             className="mt-4 bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
             type="submit"
           >
-            Sign up &rarr;
+            Sign In &rarr;
             <BottomGradient />
           </button>
 
@@ -122,13 +105,13 @@ export function SignupForm() {
 
           <div className="flex mt-4 gap-x-2">
             <span className="text-neutral-500 dark:text-neutral-400">
-              Already have an account?{" "}
+              Don't have an account?
             </span>
             <Link
-              href="/auth/login"
+              href="/"
               className="text-neutral-700 dark:text-neutral-300 font-medium"
             >
-              Login
+              Register
             </Link>
           </div>
         </form>
