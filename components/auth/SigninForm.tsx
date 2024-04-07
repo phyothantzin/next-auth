@@ -1,17 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
+import React, { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
+import { login } from "@/actions/auth";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 import { loginSchema } from "@/schemas";
 import { cn } from "@/utils/cn";
@@ -19,8 +20,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
 
 import { Input } from "../ui/input";
+import { FormError } from "./FormError";
+import { FormSuccess } from "./FormSuccess";
 
 export function SigninForm() {
+  const [success, setSuccess] = useState<string | undefined>("");
+  const [error, setError] = useState<string | undefined>("");
+  const [isPending, startTransition] = useTransition();
+
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -30,7 +37,15 @@ export function SigninForm() {
   });
 
   function onSubmit(values: z.infer<typeof loginSchema>) {
-    console.log(values);
+    setError("");
+    setSuccess("");
+
+    startTransition(() => {
+      login(values).then((data) => {
+        setError(data.error);
+        setSuccess(data.success);
+      });
+    });
   }
 
   return (
@@ -49,7 +64,11 @@ export function SigninForm() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="Email address" {...field} />
+                  <Input
+                    disabled={isPending}
+                    placeholder="Email address"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -63,15 +82,23 @@ export function SigninForm() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input placeholder="Password" {...field} />
+                  <Input
+                    disabled={isPending}
+                    placeholder="Password"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
+          <FormError message={error} />
+          <FormSuccess message={success} />
+
           <button
             className="mt-4 bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+            disabled={isPending}
             type="submit"
           >
             Sign In &rarr;
@@ -108,7 +135,7 @@ export function SigninForm() {
               Don't have an account?
             </span>
             <Link
-              href="/"
+              href="/auth/register"
               className="text-neutral-700 dark:text-neutral-300 font-medium"
             >
               Register
