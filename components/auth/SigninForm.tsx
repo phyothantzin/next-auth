@@ -5,6 +5,7 @@ import React, { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
+import { signIn } from "next-auth/react";
 import { login } from "@/actions/auth";
 import {
   Form,
@@ -22,6 +23,7 @@ import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
 import { Input } from "../ui/input";
 import { FormError } from "./FormError";
 import { FormSuccess } from "./FormSuccess";
+import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 
 export function SigninForm() {
   const [success, setSuccess] = useState<string | undefined>("");
@@ -47,6 +49,12 @@ export function SigninForm() {
       });
     });
   }
+
+  const onClick = (provider: "google" | "github") => {
+    signIn(provider, {
+      callbackUrl: DEFAULT_LOGIN_REDIRECT,
+    });
+  };
 
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
@@ -110,7 +118,8 @@ export function SigninForm() {
           <div className="flex flex-col space-y-4">
             <button
               className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
-              type="submit"
+              type="button"
+              onClick={() => onClick("github")}
             >
               <IconBrandGithub className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
               <span className="text-neutral-700 dark:text-neutral-300 text-sm">
@@ -120,7 +129,8 @@ export function SigninForm() {
             </button>
             <button
               className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
-              type="submit"
+              type="button"
+              onClick={() => onClick("google")}
             >
               <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
               <span className="text-neutral-700 dark:text-neutral-300 text-sm">
