@@ -1,14 +1,16 @@
 "use server";
 
-import bcrypt from "bcryptjs";
-import { AuthError } from "next-auth";
 import * as z from "zod";
 
-import { signIn } from "@/auth";
-import { db } from "@/lib/db";
-import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { loginSchema, registerSchema } from "@/schemas";
+
+import { AuthError } from "next-auth";
+import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
+import bcrypt from "bcryptjs";
+import { db } from "@/lib/db";
+import { generateVerificationToken } from "@/utils/verificationToken";
 import { getUserByEmail } from "@/utils/user";
+import { signIn } from "@/auth";
 
 export const login = async (values: z.infer<typeof loginSchema>) => {
   const validatedFields = loginSchema.safeParse(values);
@@ -18,6 +20,19 @@ export const login = async (values: z.infer<typeof loginSchema>) => {
   }
 
   const { email, password } = validatedFields.data;
+
+  const existingUser = await getUserByEmail(email);
+
+  if (!existingUser || !existingUser.email || !existingUser.password) {
+    return { error: "Email doesn't exist" };
+  }
+
+  if (!existingUser.emailVerified) {
+    const vertificationToken = await generateVerificationToken(
+      existingUser.email
+    );
+    return { success: "Confirmation Email Sent!" };
+  }
 
   try {
     await signIn("credentials", {
@@ -64,5 +79,7 @@ export const register = async (values: z.infer<typeof registerSchema>) => {
     },
   });
 
-  return { success: "Email Sent!" };
+  const vertificationToken = await generateVerificationToken(email);
+
+  return { success: "Confirmation Email Sent!" };
 };

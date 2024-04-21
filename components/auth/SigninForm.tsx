@@ -1,12 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import React, { useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { signIn } from "next-auth/react";
-import { login } from "@/actions/auth";
 import {
   Form,
   FormControl,
@@ -15,15 +10,20 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { loginSchema } from "@/schemas";
-import { cn } from "@/utils/cn";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
+import React, { useState, useTransition } from "react";
 
-import { Input } from "../ui/input";
+import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { FormError } from "./FormError";
 import { FormSuccess } from "./FormSuccess";
-import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
+import { Input } from "../ui/input";
+import Link from "next/link";
+import { cn } from "@/utils/cn";
+import { login } from "@/actions/auth";
+import { loginSchema } from "@/schemas";
+import { signIn } from "next-auth/react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export function SigninForm() {
   const [success, setSuccess] = useState<string | undefined>("");
@@ -44,8 +44,8 @@ export function SigninForm() {
 
     startTransition(() => {
       login(values).then((data) => {
-        setError(data.error);
-        setSuccess(data.success);
+        setError(data?.error);
+        setSuccess(data?.success);
       });
     });
   }

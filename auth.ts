@@ -1,9 +1,7 @@
 import NextAuth from "next-auth";
-
-import { db } from "@/lib/db";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-
 import authConfig from "./auth.config";
+import { db } from "@/lib/db";
 import { getUserById } from "./utils/user";
 
 export const {
@@ -12,17 +10,36 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
+  pages: {
+    signIn: "/auth/login",
+    error: "/auth/error",
+  },
+  events: {
+    async linkAccount({ user }) {
+      await db.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          emailVerified: new Date(),
+        },
+      });
+    },
+  },
   callbacks: {
-    // async signIn({ user }) {
-    //   if (!user.id) return false;
-    //   const existingUser = await getUserById(user.id);
+    async signIn({ user, account }) {
+      if (account?.provider !== "credentials") return true;
 
-    //   if (!existingUser || !existingUser.emailVerified) {
-    //     return false;
-    //   }
+      if (!user.id) return false;
 
-    //   return true;
-    // },
+      const existingUser = await getUserById(user.id);
+
+      if (!existingUser || !existingUser.emailVerified) {
+        return false;
+      }
+
+      return true;
+    },
     async session({ token, session }) {
       if (token.sub && session.user) {
         session.user.id = token.sub;

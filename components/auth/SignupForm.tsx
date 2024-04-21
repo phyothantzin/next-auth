@@ -1,11 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import React, { useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { register } from "@/actions/auth";
 import {
   Form,
   FormControl,
@@ -14,14 +10,18 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { registerSchema } from "@/schemas";
-import { cn } from "@/utils/cn";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
+import React, { useState, useTransition } from "react";
 
-import { Input } from "../ui/input";
 import { FormError } from "./FormError";
 import { FormSuccess } from "./FormSuccess";
+import { Input } from "../ui/input";
+import Link from "next/link";
+import { cn } from "@/utils/cn";
+import { register } from "@/actions/auth";
+import { registerSchema } from "@/schemas";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export function SignupForm() {
   const [success, setSuccess] = useState<string | undefined>("");
@@ -114,7 +114,7 @@ export function SignupForm() {
           <div className="flex flex-col space-y-4">
             <button
               className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
-              type="submit"
+              type="button"
             >
               <IconBrandGithub className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
               <span className="text-neutral-700 dark:text-neutral-300 text-sm">
@@ -124,7 +124,7 @@ export function SignupForm() {
             </button>
             <button
               className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
-              type="submit"
+              type="button"
             >
               <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
               <span className="text-neutral-700 dark:text-neutral-300 text-sm">
