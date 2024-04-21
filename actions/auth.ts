@@ -10,6 +10,7 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { generateVerificationToken } from "@/utils/verificationToken";
 import { getUserByEmail } from "@/utils/user";
+import { sendVerificationEmail } from "@/lib/mail";
 import { signIn } from "@/auth";
 
 export const login = async (values: z.infer<typeof loginSchema>) => {
@@ -28,9 +29,15 @@ export const login = async (values: z.infer<typeof loginSchema>) => {
   }
 
   if (!existingUser.emailVerified) {
-    const vertificationToken = await generateVerificationToken(
+    const verificationToken = await generateVerificationToken(
       existingUser.email
     );
+
+    await sendVerificationEmail(
+      verificationToken.email,
+      verificationToken.token
+    );
+
     return { success: "Confirmation Email Sent!" };
   }
 
@@ -79,7 +86,9 @@ export const register = async (values: z.infer<typeof registerSchema>) => {
     },
   });
 
-  const vertificationToken = await generateVerificationToken(email);
+  const verificationToken = await generateVerificationToken(email);
+
+  await sendVerificationEmail(verificationToken.email, verificationToken.token);
 
   return { success: "Confirmation Email Sent!" };
 };
