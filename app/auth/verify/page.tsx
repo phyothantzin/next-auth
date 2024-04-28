@@ -10,7 +10,7 @@ import error from "next/error";
 import { useSearchParams } from "next/navigation";
 import { verification } from "@/actions/verification";
 
-export function Page() {
+export default function Page() {
   const [error, setError] = useState<string | undefined>();
   const [success, setSuccess] = useState<string | undefined>();
 

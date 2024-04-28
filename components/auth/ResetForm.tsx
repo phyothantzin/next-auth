@@ -11,55 +11,46 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
-import React, { useState, useTransition } from "react";
+import React, { startTransition, useState, useTransition } from "react";
 
 import { Button } from "../ui/button";
-import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { FormError } from "./FormError";
 import { FormSuccess } from "./FormSuccess";
 import { Input } from "../ui/input";
 import Link from "next/link";
 import { cn } from "@/utils/cn";
-import { login } from "@/actions/auth";
-import { loginSchema } from "@/schemas";
-import { signIn } from "next-auth/react";
+import { forgotPasswordSchema } from "@/schemas";
+import { reset } from "@/actions/reset";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-export function SigninForm() {
+export function ResetForm() {
   const [success, setSuccess] = useState<string | undefined>("");
   const [error, setError] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<z.infer<typeof forgotPasswordSchema>>({
+    resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof loginSchema>) {
+  function onSubmit(values: z.infer<typeof forgotPasswordSchema>) {
     setError("");
     setSuccess("");
 
     startTransition(() => {
-      login(values).then((data) => {
+      reset(values).then((data) => {
         setError(data?.error);
         setSuccess(data?.success);
       });
     });
   }
 
-  const onClick = (provider: "google" | "github") => {
-    signIn(provider, {
-      callbackUrl: DEFAULT_LOGIN_REDIRECT,
-    });
-  };
-
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
-      <h1 className="text-3xl font-bold">Sign In</h1>
+      <h1 className="text-3xl font-bold">Reset Password</h1>
 
       <Form {...form}>
         <form
@@ -79,38 +70,19 @@ export function SigninForm() {
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={isPending}
-                    placeholder="Password"
-                    type="password"
-                    {...field}
-                  />
-                </FormControl>
                 <Button
                   size="sm"
                   variant="link"
                   asChild
-                  type="button"
                   className="mt-2 px-0 font-normal"
                 >
-                  <Link href="/auth/reset">Forgot Password?</Link>
+                  <Link href="/auth/login">Go back</Link>
                 </Button>
                 <FormMessage />
               </FormItem>
             )}
           />
+
           <FormError message={error} />
           <FormSuccess message={success} />
 
@@ -119,48 +91,11 @@ export function SigninForm() {
             disabled={isPending}
             type="submit"
           >
-            Sign In &rarr;
+            Send Reset Password Email &rarr;
             <BottomGradient />
           </button>
 
           <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
-
-          <div className="flex flex-col space-y-4">
-            <button
-              className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
-              type="button"
-              onClick={() => onClick("github")}
-            >
-              <IconBrandGithub className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-                GitHub
-              </span>
-              <BottomGradient />
-            </button>
-            <button
-              className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
-              type="button"
-              onClick={() => onClick("google")}
-            >
-              <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-              <span className="text-neutral-700 dark:text-neutral-300 text-sm">
-                Google
-              </span>
-              <BottomGradient />
-            </button>
-          </div>
-
-          <div className="flex mt-4 gap-x-2">
-            <span className="text-neutral-500 dark:text-neutral-400">
-              Don't have an account?
-            </span>
-            <Link
-              href="/auth/register"
-              className="text-neutral-700 dark:text-neutral-300 font-medium"
-            >
-              Register
-            </Link>
-          </div>
         </form>
       </Form>
     </div>
